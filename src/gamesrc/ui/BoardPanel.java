@@ -16,11 +16,13 @@ public class BoardPanel extends JPanel{
     private final int cellSize = 60;
     private final Font boardFont;
     private Image[] playerSprites = new Image[4];
+    private Image woodTexture;
 
     public BoardPanel(Board board, Player[] players) {
         this.board = board;
         this.players = players;
         loadPlayerSprites();
+        loadTiles();
         setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
         this.boardFont = new Font("Arial", Font.BOLD, 30);
     }
@@ -36,6 +38,18 @@ public class BoardPanel extends JPanel{
         drawBoard(g);
         drawSnakesAndLadders(g);
         drawPlayers(g);
+
+        for (Player p : players) {
+            if (p.isMoving()) {
+                Timer t = new Timer(200, e -> {
+                    ((Timer) e.getSource()).stop();
+                    repaint();
+                });
+                t.setRepeats(false);
+                t.start();
+                break;
+            }
+        }
     }
 
     private void drawBoard(Graphics g) {
@@ -52,11 +66,12 @@ public class BoardPanel extends JPanel{
                 String numStr = String.valueOf(number);
 
                 // Cell background
-                g.setColor(Color.white);
-                g.fillRect(x, y, cellSize - gap, cellSize - gap);
-
-                g.setColor(Color.black);
-                g.drawRect(x, y, cellSize - gap, cellSize - gap);
+                if (number % 2 == 1 && woodTexture != null) {
+                    g.drawImage(woodTexture, x, y, cellSize - gap, cellSize - gap, null);
+                } else {
+                    g.setColor(Color.white);
+                    g.fillRect(x, y, cellSize - gap, cellSize - gap);
+                }
 
                 // Number's position
                 int textWidth = metrics.stringWidth(numStr);
@@ -96,17 +111,6 @@ public class BoardPanel extends JPanel{
         return new Point(x, y);
     }
 
-    private void loadPlayerSprites() {
-        try {
-            for (int i = 0; i < 4; i++) {
-                String path = "/gamesrc/assets/sprites/Player" + (i + 1) + ".png";
-                playerSprites[i] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void drawPlayers (Graphics g) {
         final int drawSize = 32;
         final int offset = 16;
@@ -144,5 +148,24 @@ public class BoardPanel extends JPanel{
             if (players[i] == p) return i;
         }
         return 0;
+    }
+
+    private void loadPlayerSprites() {
+        try {
+            for (int i = 0; i < 4; i++) {
+                String path = "/gamesrc/assets/sprites/Player" + (i + 1) + ".png";
+                playerSprites[i] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadTiles() {
+        try {
+            woodTexture = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/gamesrc/assets/tileset/wood.jpg")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
