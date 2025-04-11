@@ -3,11 +3,12 @@ package gamesrc.ui;
 import gamesrc.game.Board;
 import gamesrc.game.Dice;
 import gamesrc.entities.Player;
+import gamesrc.ui.interfaces.IGameUI;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class GameUI extends JFrame {
+public class GameUI extends JFrame implements IGameUI {
     private final Board board;
     private final Dice dice;
     private final Player[] players;
@@ -25,14 +26,16 @@ public class GameUI extends JFrame {
         initUI();
     }
 
-    private void initPlayers() {
+    @Override
+    public void initPlayers() {
         players[0] = new Player("Player 1");
         players[1] = new Player("Player 2");
         players[2] = new Player("Player 3");
         players[3] = new Player("Player 4");
     }
 
-    private void initUI() {
+    @Override
+    public void initUI() {
         setTitle("Snakes and Ladders - D20 Edition");
                 setSize(650, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);

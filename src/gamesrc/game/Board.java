@@ -2,10 +2,12 @@ package gamesrc.game;
 
 import gamesrc.entities.Snake;
 import gamesrc.entities.Ladder;
+import gamesrc.game.abstracts.ABoard;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Board {
+public class Board extends ABoard {
     private final int size = 100;
     private List<Snake> snakes;
     private List<Ladder> ladders;
@@ -16,7 +18,8 @@ public class Board {
         initBoard();
     }
 
-    private void initBoard() {
+    @Override
+    public void initBoard() {
         snakes.add(new Snake(99, 54));
         snakes.add(new Snake(70, 55));
         snakes.add(new Snake(52, 42));
@@ -38,6 +41,7 @@ public class Board {
         return ladders;
     }
 
+    @Override
     public int checkSnakesAndLadders(int pos) {
         for (Snake s : snakes) {
             if (s.getStart() == pos) return s.getEnd();

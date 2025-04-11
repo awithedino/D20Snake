@@ -2,6 +2,7 @@ package gamesrc.ui;
 
 import gamesrc.entities.*;
 import gamesrc.game.Board;
+import gamesrc.ui.interfaces.IBoardPanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -10,7 +11,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class BoardPanel extends JPanel{
+public class BoardPanel extends JPanel implements IBoardPanel {
     private final Board board;
     private final Player[] players;
     private final int cellSize = 60;
@@ -38,7 +39,8 @@ public class BoardPanel extends JPanel{
         drawPlayers(g);
     }
 
-    private void drawBoard(Graphics g) {
+    @Override
+    public void drawBoard(Graphics g) {
         g.setFont(boardFont);
         FontMetrics metrics = g.getFontMetrics(boardFont);
         int gap = 2;
@@ -80,13 +82,15 @@ public class BoardPanel extends JPanel{
         }
     }
 
-    private void drawLineBetweenCells (Graphics g, int start, int end) {
+    @Override
+    public void drawLineBetweenCells (Graphics g, int start, int end) {
         Point p1 = getCellCenter(start);
         Point p2 = getCellCenter(end);
         g.drawLine(p1.x, p1.y, p2.x, p2.y);
     }
 
-    private Point getCellCenter(int position) {
+    @Override
+    public Point getCellCenter(int position) {
         if (position > 100) position = 100;
         int row = (position - 1) / 10;
         int col = (position - 1) % 10;
