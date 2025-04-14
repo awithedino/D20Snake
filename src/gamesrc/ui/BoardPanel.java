@@ -16,7 +16,8 @@ public class BoardPanel extends JPanel{
     private final int cellSize = 60;
     private final Font boardFont;
     private Image[] playerSprites = new Image[4];
-    private Image woodTexture;
+    private Image lightWoodTexture;
+    private Image darkWoodTexture;
 
     public BoardPanel(Board board, Player[] players) {
         this.board = board;
@@ -36,7 +37,7 @@ public class BoardPanel extends JPanel{
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
         drawBoard(g);
-        drawSnakesAndLadders(g);
+        drawSnakesAndLadders(g2);
         drawPlayers(g);
 
         for (Player p : players) {
@@ -66,11 +67,12 @@ public class BoardPanel extends JPanel{
                 String numStr = String.valueOf(number);
 
                 // Cell background
-                if (number % 2 == 1 && woodTexture != null) {
-                    g.drawImage(woodTexture, x, y, cellSize - gap, cellSize - gap, null);
-                } else {
-                    g.setColor(Color.white);
-                    g.fillRect(x, y, cellSize - gap, cellSize - gap);
+                if (number % 2 == 1 && lightWoodTexture != null) {
+                    g.drawImage(lightWoodTexture, x, y, cellSize - gap, cellSize - gap, null);
+                    g.setColor(Color.darkGray);
+                } else if (darkWoodTexture != null){
+                    g.drawImage(darkWoodTexture, x, y, cellSize - gap, cellSize - gap, null);
+                    g.setColor(Color.lightGray);
                 }
 
                 // Number's position
@@ -83,8 +85,9 @@ public class BoardPanel extends JPanel{
         }
     }
 
-    private void drawSnakesAndLadders (Graphics g) {
+    private void drawSnakesAndLadders (Graphics2D g) {
         g.setColor(Color.red);
+        g.setStroke(new BasicStroke(5));
         for (Snake s : board.getSnakes()) {
             drawLineBetweenCells(g, s.getStart(), s.getEnd());
         }
@@ -163,7 +166,8 @@ public class BoardPanel extends JPanel{
 
     private void loadTiles() {
         try {
-            woodTexture = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/gamesrc/assets/tileset/wood.jpg")));
+            lightWoodTexture = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/gamesrc/assets/tileset/Wood1.jpg")));
+            darkWoodTexture = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/gamesrc/assets/tileset/Wood2.jpg")));
         } catch (IOException e) {
             e.printStackTrace();
         }

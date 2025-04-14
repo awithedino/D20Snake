@@ -19,7 +19,7 @@ public class GameUI extends JFrame {
     private JButton rollButton;
 
     public GameUI() {
-        board = new Board();
+        board = new Board("src/gamesrc/assets/presets/boardPresets.json");
         dice = new Dice();
         players = new Player[4];
         currentPlayerIndex = 0;
@@ -36,7 +36,8 @@ public class GameUI extends JFrame {
 
     private void initUI() {
         setTitle("Snakes and Ladders - D20 Edition");
-                setSize(650, 750);
+        setSize(613, 685);
+        setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
