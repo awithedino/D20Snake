@@ -17,11 +17,14 @@ public class BoardPanel extends JPanel implements IBoardPanel {
     private final int cellSize = 60;
     private final Font boardFont;
     private Image[] playerSprites = new Image[4];
+    private Image lightWoodTexture;
+    private Image darkWoodTexture;
 
     public BoardPanel(Board board, Player[] players) {
         this.board = board;
         this.players = players;
         loadPlayerSprites();
+        loadTiles();
         setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
         this.boardFont = new Font("Arial", Font.BOLD, 30);
     }
@@ -35,8 +38,20 @@ public class BoardPanel extends JPanel implements IBoardPanel {
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
         drawBoard(g);
-        drawSnakesAndLadders(g);
+        drawSnakesAndLadders(g2);
         drawPlayers(g);
+
+        for (Player p : players) {
+            if (p.isMoving()) {
+                Timer t = new Timer(200, e -> {
+                    ((Timer) e.getSource()).stop();
+                    repaint();
+                });
+                t.setRepeats(false);
+                t.start();
+                break;
+            }
+        }
     }
 
     @Override
@@ -54,11 +69,13 @@ public class BoardPanel extends JPanel implements IBoardPanel {
                 String numStr = String.valueOf(number);
 
                 // Cell background
-                g.setColor(Color.white);
-                g.fillRect(x, y, cellSize - gap, cellSize - gap);
-
-                g.setColor(Color.black);
-                g.drawRect(x, y, cellSize - gap, cellSize - gap);
+                if (number % 2 == 1 && lightWoodTexture != null) {
+                    g.drawImage(lightWoodTexture, x, y, cellSize - gap, cellSize - gap, null);
+                    g.setColor(Color.darkGray);
+                } else if (darkWoodTexture != null){
+                    g.drawImage(darkWoodTexture, x, y, cellSize - gap, cellSize - gap, null);
+                    g.setColor(Color.lightGray);
+                }
 
                 // Number's position
                 int textWidth = metrics.stringWidth(numStr);
@@ -70,8 +87,9 @@ public class BoardPanel extends JPanel implements IBoardPanel {
         }
     }
 
-    private void drawSnakesAndLadders (Graphics g) {
+    private void drawSnakesAndLadders (Graphics2D g) {
         g.setColor(Color.red);
+        g.setStroke(new BasicStroke(5));
         for (Snake s : board.getSnakes()) {
             drawLineBetweenCells(g, s.getStart(), s.getEnd());
         }
@@ -98,17 +116,6 @@ public class BoardPanel extends JPanel implements IBoardPanel {
         int x =  col * cellSize + cellSize / 2;
         int y = (9 - row) * cellSize + cellSize / 2;
         return new Point(x, y);
-    }
-
-    private void loadPlayerSprites() {
-        try {
-            for (int i = 0; i < 4; i++) {
-                String path = "/gamesrc/assets/sprites/Player" + (i + 1) + ".png";
-                playerSprites[i] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void drawPlayers (Graphics g) {
@@ -148,5 +155,25 @@ public class BoardPanel extends JPanel implements IBoardPanel {
             if (players[i] == p) return i;
         }
         return 0;
+    }
+
+    private void loadPlayerSprites() {
+        try {
+            for (int i = 0; i < 4; i++) {
+                String path = "/gamesrc/assets/sprites/Player" + (i + 1) + ".png";
+                playerSprites[i] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadTiles() {
+        try {
+            lightWoodTexture = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/gamesrc/assets/tileset/Wood1.jpg")));
+            darkWoodTexture = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/gamesrc/assets/tileset/Wood2.jpg")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
