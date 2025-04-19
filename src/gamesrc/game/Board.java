@@ -1,38 +1,32 @@
 package gamesrc.game;
+import java.util.*;
 
 import gamesrc.entities.Snake;
 import gamesrc.entities.Ladder;
-import java.awt.*;
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
+import gamesrc.util.PresetLoader;
 
-public class Board extends JPanel {
-    private final int size = 100;
-    private List<Snake> snakes;
-    private List<Ladder> ladders;
-    private final int cellSize = 50;
-    private final int boardWidth = 10;
+public class Board {
+    private final static int size = 100;
+    private final List<Snake> snakes;
+    private final List<Ladder> ladders;
+    private final String presetPath;
 
-
-    public Board() {
+    public Board(String presetPath) {
         snakes = new ArrayList<>();
         ladders = new ArrayList<>();
+        this.presetPath = presetPath;
         initBoard();
-        setPreferredSize(new Dimension(cellSize * boardWidth, cellSize * boardWidth));
     }
 
     private void initBoard() {
-        snakes.add(new Snake(99, 54));
-        snakes.add(new Snake(70, 55));
-        snakes.add(new Snake(52, 42));
-        snakes.add(new Snake(25, 2));
-        snakes.add(new Snake(95, 72));
-        ladders.add(new Ladder(6, 25));
-        ladders.add(new Ladder(11, 40));
-        ladders.add(new Ladder(60, 85));
-        ladders.add(new Ladder(46, 90));
-        ladders.add(new Ladder(17, 69));
+        snakes.clear();
+        ladders.clear();
+        PresetLoader.loadPresets(presetPath);
+        String randomPresetName = PresetLoader.getRandomPresetName();
+
+        // Random
+        snakes.addAll(PresetLoader.snakePresets.get(randomPresetName));
+        ladders.addAll(PresetLoader.ladderPresets.get(randomPresetName));
     }
 
     public List<Snake> getSnakes() {
@@ -52,9 +46,8 @@ public class Board extends JPanel {
         }
         return pos;
     }
-}
-//
-//    public int getSize() {
-//        return size;
-//    }
 
+    public int getSize() {
+        return size;
+    }
+}
