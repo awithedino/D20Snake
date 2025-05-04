@@ -11,11 +11,15 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class BoardPanel extends JPanel{
+    private static final int numRows = 10;
+    private static final int numCols = 10;
+    private static final int numPlayers = 4;
+
     private final Board board;
     private final Player[] players;
     private final int cellSize = 60;
     private final Font boardFont;
-    private Image[] playerSprites = new Image[4];
+    private Image[] playerSprites = new Image[numPlayers];
     private Image lightWoodTexture;
     private Image darkWoodTexture;
 
@@ -24,7 +28,7 @@ public class BoardPanel extends JPanel{
         this.players = players;
         loadPlayerSprites();
         loadTiles();
-        setPreferredSize(new Dimension(10 * cellSize, 10 * cellSize));
+        setPreferredSize(new Dimension(numRows * cellSize, numCols * cellSize));
         this.boardFont = new Font("Arial", Font.BOLD, 30);
     }
 
@@ -58,8 +62,8 @@ public class BoardPanel extends JPanel{
         FontMetrics metrics = g.getFontMetrics(boardFont);
         int gap = 2;
 
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
                 int x = j * cellSize;
                 int y = (9 - i) * cellSize;
 
@@ -105,7 +109,7 @@ public class BoardPanel extends JPanel{
     }
 
     private Point getCellCenter(int position) {
-        if (position > 100) position = 100;
+        if (position > (numCols * numRows)) position = (numCols * numRows);
         int row = (position - 1) / 10;
         int col = (position - 1) % 10;
         if (row % 2 == 1) col = 9 - col;
@@ -118,7 +122,7 @@ public class BoardPanel extends JPanel{
         final int drawSize = 32;
         final int offset = 16;
 
-        for (int cell = 1; cell <= 100; cell++) {
+        for (int cell = 1; cell <= (numCols * numRows); cell++) {
             int finalCell = cell;
 
             Player[] sameCellPlayers = Arrays.stream(players)
@@ -155,7 +159,7 @@ public class BoardPanel extends JPanel{
 
     private void loadPlayerSprites() {
         try {
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < numPlayers; i++) {
                 String path = "/gamesrc/assets/sprites/Player" + (i + 1) + ".png";
                 playerSprites[i] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
             }
