@@ -3,7 +3,6 @@ package gamesrc.ui;
 import gamesrc.game.Board;
 import gamesrc.game.Dice;
 import gamesrc.entities.Player;
-import gamesrc.ui.SharpRoundedBorder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,32 +14,34 @@ import java.net.URL;
 import java.util.Objects;
 
 public class GameUI extends JFrame {
+    // Game constants
     private static final int numRows = 10;
     private static final int numCols = 10;
-    private static final int numPlayers = 4;
 
+    // Game variables
     private final Board board;
     private final Dice dice;
-    private final Player[] players;
-    private int currentPlayerIndex;
+    private Player[] players;
+    private int currentPlayerIndex = 0;
+
+    // UI components
     private JPanel boardPanel;
     private JLabel statusLabel;
     private JButton rollButton;
 
-    public GameUI() {
+    public GameUI(int numberOfPlayers) {
         board = new Board("src/gamesrc/assets/presets/boardPresets.json");
         dice = new Dice();
-        players = new Player[numPlayers];
-        currentPlayerIndex = 0;
-        initPlayers();
+        players = new Player[numberOfPlayers];
+        initPlayers(numberOfPlayers);
         initUI();
     }
 
-    private void initPlayers() {
-        players[0] = new Player("Blue");
-        players[1] = new Player("Green");
-        players[2] = new Player("Purple");
-        players[3] = new Player("Orange");
+    private void initPlayers(int numberOfPlayers) {
+        String[] names = {"Blue", "Green", "Purple", "Orange"};
+        for (int i = 0; i < numberOfPlayers; i++) {
+            players[i] = new Player(names[i % names.length]);
+        }
     }
 
     private void initUI() {
@@ -175,9 +176,5 @@ public class GameUI extends JFrame {
                 }
             }
         });
-    }
-
-    public static void launchGame() {
-        SwingUtilities.invokeLater(GameUI::new);
     }
 }

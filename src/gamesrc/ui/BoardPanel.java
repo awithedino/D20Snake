@@ -13,20 +13,20 @@ import java.util.Objects;
 public class BoardPanel extends JPanel{
     private static final int numRows = 10;
     private static final int numCols = 10;
-    private static final int numPlayers = 4;
 
     private final Board board;
     private final Player[] players;
     private final int cellSize = 60;
     private final Font boardFont;
-    private Image[] playerSprites = new Image[numPlayers];
+    private Image[] playerSprites;
     private Image lightWoodTexture;
     private Image darkWoodTexture;
 
     public BoardPanel(Board board, Player[] players) {
         this.board = board;
         this.players = players;
-        loadPlayerSprites();
+        this.playerSprites = new Image[players.length]; // Use actual length
+        loadPlayerSprites(); // Load sprites based on players
         loadTiles();
         setPreferredSize(new Dimension(numRows * cellSize, numCols * cellSize));
         this.boardFont = new Font("Arial", Font.BOLD, 30);
@@ -159,11 +159,14 @@ public class BoardPanel extends JPanel{
 
     private void loadPlayerSprites() {
         try {
-            for (int i = 0; i < numPlayers; i++) {
+            // Only load sprites for the players actually in the game
+            for (int i = 0; i < players.length; i++) {
                 String path = "/gamesrc/assets/sprites/Player" + (i + 1) + ".png";
                 playerSprites[i] = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(path)));
             }
         } catch (IOException e) {
+            System.err.println("Error loading player sprites: " + e.getMessage());
+            // Consider adding placeholder sprites or handling the error more gracefully
             e.printStackTrace();
         }
     }
