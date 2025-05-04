@@ -194,70 +194,99 @@ public class GameUI extends JFrame {
 
         Player currentPlayer = players[currentPlayerIndex];
         int roll = dice.roll();
+        int from = currentPlayer.getPosition();
+        int rawTarget = from + roll;
 
         statusLabel.setText(currentPlayer.getName() + " rolled a " + roll);
+        int firstPathEnd;
+        int bounceBackTargetSquare = -1; // indicate if we need to go back
 
-        int from = currentPlayer.getPosition();
-        int to = from + roll;
+        if (rawTarget > boardSize) {
+            // --- Overshot ---
+            firstPathEnd = boardSize; // Move to 100
+            int excess = rawTarget - boardSize;
+            bounceBackTargetSquare = Math.max(1, boardSize - excess); // Calculate where to bounce back
 
-        // In case of reaching 100 with steps left
-        if (to > boardSize) {
-            int excess = to - boardSize;
-            to = Math.max(1, boardSize - excess);
+            // Set movement path ONLY to 100 for the first animation phase
+            currentPlayer.setMovementPath(from, firstPathEnd);
+            statusLabel.setText(currentPlayer.getName() + " hits 100..."); // Update status
+
+        } else {
+            // Did not pass 100
+            firstPathEnd = rawTarget; // Move directly to the target
+            currentPlayer.setMovementPath(from, firstPathEnd);
         }
-        currentPlayer.setMovementPath(from, to);
 
-        Timer timer = getTimer(currentPlayer);
+        // Start the timer
+        Timer timer = getTimer(currentPlayer, bounceBackTargetSquare);
         timer.start();
     }
 
-    // --- Your existing getTimer method ---
-    private Timer getTimer(Player currentPlayer) {
-        return new Timer (1, new ActionListener() {
-            boolean movementPathFinished = false;
-            boolean teleportChecked = false;     // Teleport check happens once after movement
+    private Timer getTimer(Player currentPlayer, int bounceBackTargetSquare) {
+        // Use a slightly longer delay maybe? Optional.
+        return new Timer(100, new ActionListener() {
+            // State flags
+            boolean isAnimatingMovement = true; // Am I moving?
+            boolean needsToStartBounceBack = (bounceBackTargetSquare != -1); // Do I have to return?
+            boolean teleportCheckPending = true; // Check snakes or ladders
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 Timer timer = (Timer) e.getSource();
 
-                if (!movementPathFinished) {
+                // Movement (forwards and potentially backwards)
+                if (isAnimatingMovement) {
                     if (currentPlayer.step()) {
+                        // Continue
                         boardPanel.repaint();
+                        return;
                     } else {
-                        // Movement path is done, but don't stop timer yet
-                        movementPathFinished = true;
+                        // Finished the current movement path (either to 100 or to target/bounce-back spot)
+                        isAnimatingMovement = false; // Stop animating for now
                         boardPanel.repaint();
+
+                        // First IF: Do I have to turn back?
+                        if (needsToStartBounceBack) {
+                            statusLabel.setText(currentPlayer.getName() + " bounces back from 100!");
+                            // Set the *new* path for the backward movement
+                            currentPlayer.setMovementPath(boardSize, bounceBackTargetSquare);
+                            needsToStartBounceBack = false; // Don't trigger bounce again
+                            isAnimatingMovement = true; // Walk backwards
+                            return;
+                        }
                     }
-                } else if (!teleportChecked) {
-                    // Movement animation finished, now check for snakes/ladders
+                }
+
+                // Check Snakes / Ladders
+                // Second last ordered
+                if (teleportCheckPending) {
                     int currentPos = currentPlayer.getPosition();
                     int finalPos = board.checkSnakesAndLadders(currentPos);
+                    teleportCheckPending = false; // Check only once per turn
 
                     if (finalPos != currentPos) {
-                        // Teleport: Set position directly.
+                        // Found a snake or ladder.
+                        statusLabel.setText(currentPlayer.getName() + (finalPos > currentPos ? " climbed a ladder!" : " slid down a snake!"));
+                        // Animate this? Or snap? Snap.
                         currentPlayer.setPosition(finalPos);
                         boardPanel.repaint();
-                        statusLabel.setText(currentPlayer.getName() + (finalPos > currentPos ? " climbed a ladder!" : " slid down a snake!"));
                     } else {
-                        // No snake or ladder, just update status normally after movement
                         statusLabel.setText(currentPlayer.getName() + " landed on " + currentPos);
                     }
-                    teleportChecked = true; // Prevent re-checking teleport
+                }
 
+                // End turn
+                // Last order
+                timer.stop(); // Stop the timer
+
+                if (currentPlayer.hasWon(boardSize)) {
+                    statusLabel.setText(currentPlayer.getName() + " wins!!!");
+                    rollButton.setEnabled(false);
                 } else {
-                    // Both movement and teleport check are done
-                    timer.stop(); // Now stop the timer
-
-                    if (currentPlayer.hasWon(boardSize)) {
-                        statusLabel.setText(currentPlayer.getName() + " wins! *\\o/*");
-                        rollButton.setEnabled(false); // Disable roll button on win
-                    } else {
-                        // Switch to the next player
-                        currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-                        statusLabel.setText("Next: " + players[currentPlayerIndex].getName() + "'s turn.");
-                        rollButton.setEnabled(true);
-                    }
+                    // Switch to the next player
+                    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+                    statusLabel.setText("Next: " + players[currentPlayerIndex].getName() + "'s turn.");
+                    rollButton.setEnabled(true);
                 }
             }
         });
