@@ -7,7 +7,10 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class BoardPanel extends JPanel{
@@ -15,6 +18,8 @@ public class BoardPanel extends JPanel{
     private static final int numCols = 10;
 
     private final Board board;
+    private Map<String, Image> presetOverlayImages = new HashMap<>();
+    private Image currentOverlayImage = null;
     private final Player[] players;
     private final int cellSize = 60;
     private final Font boardFont;
@@ -28,25 +33,75 @@ public class BoardPanel extends JPanel{
         this.playerSprites = new Image[players.length]; // Use actual length
         loadPlayerSprites(); // Load sprites based on players
         loadTiles();
+        loadOverlayImage(board.getCurrentActivePresetName());
         setPreferredSize(new Dimension(numRows * cellSize, numCols * cellSize));
         this.boardFont = new Font("Arial", Font.BOLD, 30);
+    }
+
+    private void loadOverlayImage(String presetName) {
+        if (presetName == null || presetName.isEmpty()) {
+            this.currentOverlayImage = null;
+            return;
+        }
+
+        // Check if they are already loaded
+        if (presetOverlayImages.containsKey(presetName)) {
+            this.currentOverlayImage = presetOverlayImages.get(presetName);
+            return;
+        }
+
+        String imagePath = "/gamesrc/assets/presets/presetOverlay/Overlay_" + presetName + ".png";
+        System.out.println("Attempting to load overlay: " + imagePath);
+
+        try {
+            URL imgURL = getClass().getResource(imagePath);
+            if (imgURL!= null) {
+                Image loadedImage = ImageIO.read(imgURL);
+                presetOverlayImages.put(presetName, loadedImage);
+                this.currentOverlayImage = loadedImage;
+                System.out.println("Successfully loaded overlay for: " + presetName);
+            } else {
+                System.err.println("Overlay image not found for preset: " + presetName + " at path " + imagePath);
+            }
+        } catch (IOException e) {
+            System.err.println("Error loading overlay image for preset '" + presetName + "': " + e.getMessage());
+            this.currentOverlayImage = null;
+            e.printStackTrace();
+        }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g.create(); // Use a copy for rendering hints if needed for overlay
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR); // Good for scaling images
 
-        // For the pawns
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
+        // Draw the board grid
         drawBoard(g);
-        drawSnakesAndLadders(g2);
-        drawPlayers(g);
 
+        if (this.currentOverlayImage != null) {
+            g2.drawImage(this.currentOverlayImage, 0, 0, getWidth(), getHeight(), this);
+        } else {
+            // Fallback
+            // Draw using the line system.
+            if (board.getCurrentActivePresetName() != null) { // Log only if a preset was expected
+                System.err.println("Drawing lines for preset: " + board.getCurrentActivePresetName() + " (overlay not available/loaded).");
+            }
+            drawSnakesAndLadders((Graphics2D) g); // Lines
+        }
+
+        // Draw player pawns
+        Graphics2D pawnG2 = (Graphics2D) g.create();
+        pawnG2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        drawPlayers(pawnG2);
+        pawnG2.dispose();
+
+
+        // Animation timer logic
         for (Player p : players) {
             if (p.isMoving()) {
-                Timer t = new Timer(200, e -> {
+                Timer t = new Timer(100, e -> {
                     ((Timer) e.getSource()).stop();
                     repaint();
                 });
@@ -55,6 +110,7 @@ public class BoardPanel extends JPanel{
                 break;
             }
         }
+        g2.dispose();
     }
 
     private void drawBoard(Graphics g) {

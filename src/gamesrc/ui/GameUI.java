@@ -18,6 +18,8 @@ public class GameUI extends JFrame {
     private static final int numRows = 10;
     private static final int numCols = 10;
     private static final int boardSize = numRows * numCols;
+    private static final int fixedWidth = 714;
+    private static final int fixedHeight = 817;
 
     // Game variables
     private Board board;
@@ -34,8 +36,10 @@ public class GameUI extends JFrame {
         setTitle("Snakes and Ladders - D20 Edition");
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(fixedWidth, fixedHeight);
         setLocationRelativeTo(null);
         showPlayerSelectionScreen();
+        setVisible(true);
     }
 
     private void showPlayerSelectionScreen() {
@@ -73,11 +77,8 @@ public class GameUI extends JFrame {
         contentPane.add(btn4Players);
 
         // Refresh
-        pack(); // Set size itself
         contentPane.revalidate();
         contentPane.repaint();
-        setLocationRelativeTo(null); // Recenter after casting pack()
-        setVisible(true);
     }
 
     // Players' choice button
@@ -130,10 +131,8 @@ public class GameUI extends JFrame {
         contentPane.add(controlPanel, BorderLayout.SOUTH);
 
         // Refresh it
-        pack(); // I cast pack() again
         contentPane.revalidate();
         contentPane.repaint();
-        setLocationRelativeTo(null); // Recenter after casting pack()
     }
 
     private void initPlayers(int numberOfPlayers) {

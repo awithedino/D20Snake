@@ -10,6 +10,7 @@ public class Board {
     private final List<Snake> snakes;
     private final List<Ladder> ladders;
     private final String presetPath;
+    private String currentActivePresetName;
 
     public Board(String presetPath) {
         snakes = new ArrayList<>();
@@ -22,11 +23,19 @@ public class Board {
         snakes.clear();
         ladders.clear();
         PresetLoader.loadPresets(presetPath);
-        String randomPresetName = PresetLoader.getRandomPresetName();
+        this.currentActivePresetName = PresetLoader.getRandomPresetName();
 
         // Random
-        snakes.addAll(PresetLoader.snakePresets.get(randomPresetName));
-        ladders.addAll(PresetLoader.ladderPresets.get(randomPresetName));
+        if (this.currentActivePresetName != null) {
+            snakes.addAll(PresetLoader.snakePresets.get(this.currentActivePresetName));
+            ladders.addAll(PresetLoader.ladderPresets.get(this.currentActivePresetName));
+        } else {
+            System.err.println("No preset name found to load ladders/snakes.");
+        }
+    }
+
+    public String getCurrentActivePresetName() {
+        return currentActivePresetName;
     }
 
     public List<Snake> getSnakes() {
