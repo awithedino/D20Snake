@@ -223,7 +223,7 @@ public class GameUI extends JFrame {
 
     private Timer getTimer(Player currentPlayer, int bounceBackTargetSquare) {
         // Use a slightly longer delay maybe? Optional.
-        return new Timer(100, new ActionListener() {
+        return new Timer(200, new ActionListener() {
             // State flags
             boolean isAnimatingMovement = true; // Am I moving?
             boolean needsToStartBounceBack = (bounceBackTargetSquare != -1); // Do I have to return?
