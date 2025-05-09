@@ -1,6 +1,8 @@
 package gamesrc.entities;
 
-public class Snake {
+import gamesrc.entities.interfaces.ISlideObj;
+
+public class Snake implements ISlideObj {
     private int start;
     private int end;
 

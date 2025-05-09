@@ -1,6 +1,8 @@
 package gamesrc.entities;
 
-public class Ladder {
+import gamesrc.entities.interfaces.ISlideObj;
+
+public class Ladder implements ISlideObj {
     private int start;
     private int end;
 

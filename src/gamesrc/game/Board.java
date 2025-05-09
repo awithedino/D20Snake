@@ -4,8 +4,11 @@ import java.util.*;
 import gamesrc.entities.Snake;
 import gamesrc.entities.Ladder;
 import gamesrc.util.PresetLoader;
+import gamesrc.game.abstracts.ABoard;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Board {
+public class Board extends ABoard {
     private final static int size = 100;
     private final List<Snake> snakes;
     private final List<Ladder> ladders;
@@ -19,7 +22,8 @@ public class Board {
         initBoard();
     }
 
-    private void initBoard() {
+    @Override
+    public void initBoard() {
         snakes.clear();
         ladders.clear();
         PresetLoader.loadPresets(presetPath);
@@ -46,6 +50,7 @@ public class Board {
         return ladders;
     }
 
+    @Override
     public int checkSnakesAndLadders(int pos) {
         for (Snake s : snakes) {
             if (s.getStart() == pos) return s.getEnd();

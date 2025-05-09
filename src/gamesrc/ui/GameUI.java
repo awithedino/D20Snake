@@ -3,6 +3,7 @@ package gamesrc.ui;
 import gamesrc.game.Board;
 import gamesrc.game.Dice;
 import gamesrc.entities.Player;
+import gamesrc.ui.interfaces.IGameUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +14,7 @@ import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.Objects;
 
-public class GameUI extends JFrame {
+public class GameUI extends JFrame implements IGameUI {
     // Game constants
     private static final int numRows = 10;
     private static final int numCols = 10;

@@ -2,6 +2,7 @@ package gamesrc.ui;
 
 import gamesrc.entities.*;
 import gamesrc.game.Board;
+import gamesrc.ui.interfaces.IBoardPanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -13,10 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class BoardPanel extends JPanel{
     private static final int numRows = 10;
     private static final int numCols = 10;
 
+public class BoardPanel extends JPanel implements IBoardPanel {
     private final Board board;
     private Map<String, Image> presetOverlayImages = new HashMap<>();
     private Image currentOverlayImage = null;
@@ -113,7 +114,8 @@ public class BoardPanel extends JPanel{
         g2.dispose();
     }
 
-    private void drawBoard(Graphics g) {
+    @Override
+    public void drawBoard(Graphics g) {
         g.setFont(boardFont);
         FontMetrics metrics = g.getFontMetrics(boardFont);
         int gap = 2;
@@ -158,14 +160,16 @@ public class BoardPanel extends JPanel{
         }
     }
 
-    private void drawLineBetweenCells (Graphics g, int start, int end) {
+    @Override
+    public void drawLineBetweenCells (Graphics g, int start, int end) {
         Point p1 = getCellCenter(start);
         Point p2 = getCellCenter(end);
         g.drawLine(p1.x, p1.y, p2.x, p2.y);
     }
 
-    private Point getCellCenter(int position) {
+    @Override
         if (position > (numCols * numRows)) position = (numCols * numRows);
+    public Point getCellCenter(int position) {
         int row = (position - 1) / 10;
         int col = (position - 1) % 10;
         if (row % 2 == 1) col = 9 - col;
