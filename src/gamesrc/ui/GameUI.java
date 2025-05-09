@@ -3,7 +3,7 @@ package gamesrc.ui;
 import gamesrc.game.Board;
 import gamesrc.game.Dice;
 import gamesrc.entities.Player;
-import gamesrc.ui.interfaces.IGameUI;
+import gamesrc.interfaces.IGameUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -97,7 +97,8 @@ public class GameUI extends JFrame implements IGameUI {
         return button;
     }
 
-    private void startGame(int numberOfPlayers) {
+    @Override
+    public void startGame(int numberOfPlayers) {
         // Init game objects
         board = new Board("src/gamesrc/assets/presets/boardPresets.json");
         dice = new Dice();
@@ -136,7 +137,8 @@ public class GameUI extends JFrame implements IGameUI {
         contentPane.repaint();
     }
 
-    private void initPlayers(int numberOfPlayers) {
+    @Override
+    public void initPlayers(int numberOfPlayers) {
         String[] names = {"Blue", "Green", "Purple", "Orange"};
         for (int i = 0; i < numberOfPlayers; i++) {
             players[i] = new Player(names[i % names.length]);

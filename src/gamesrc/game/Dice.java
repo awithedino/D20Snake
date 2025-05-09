@@ -1,5 +1,5 @@
 package gamesrc.game;
-import gamesrc.game.abstracts.ADice;
+import gamesrc.abstracts.ADice;
 
 import java.util.Random;
 

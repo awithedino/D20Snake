@@ -1,4 +1,4 @@
-package gamesrc.ui.interfaces;
+package gamesrc.interfaces;
 
 import java.awt.*;
 

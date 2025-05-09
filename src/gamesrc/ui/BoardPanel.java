@@ -2,7 +2,7 @@ package gamesrc.ui;
 
 import gamesrc.entities.*;
 import gamesrc.game.Board;
-import gamesrc.ui.interfaces.IBoardPanel;
+import gamesrc.interfaces.IBoardPanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+public class BoardPanel extends JPanel implements IBoardPanel {
     private static final int numRows = 10;
     private static final int numCols = 10;
 
-public class BoardPanel extends JPanel implements IBoardPanel {
     private final Board board;
     private Map<String, Image> presetOverlayImages = new HashMap<>();
     private Image currentOverlayImage = null;
@@ -168,8 +168,8 @@ public class BoardPanel extends JPanel implements IBoardPanel {
     }
 
     @Override
-        if (position > (numCols * numRows)) position = (numCols * numRows);
     public Point getCellCenter(int position) {
+        if (position > (numCols * numRows)) position = (numCols * numRows);
         int row = (position - 1) / 10;
         int col = (position - 1) % 10;
         if (row % 2 == 1) col = 9 - col;

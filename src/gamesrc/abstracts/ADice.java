@@ -1,4 +1,4 @@
-package gamesrc.game.abstracts;
+package gamesrc.abstracts;
 
 import java.util.Random;
 

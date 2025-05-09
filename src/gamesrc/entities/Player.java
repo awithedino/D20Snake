@@ -1,9 +1,8 @@
 package gamesrc.entities;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
-import gamesrc.entities.interfaces.IPlayer;
+import gamesrc.interfaces.IPlayer;
 
 public class Player implements IPlayer {
     private String name;

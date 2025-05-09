@@ -1,4 +1,4 @@
-package gamesrc.entities.interfaces;
+package gamesrc.interfaces;
 
 public interface ISlideObj {
     public int getStart();

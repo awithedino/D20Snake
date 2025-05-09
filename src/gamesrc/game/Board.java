@@ -1,10 +1,9 @@
 package gamesrc.game;
-import java.util.*;
 
 import gamesrc.entities.Snake;
 import gamesrc.entities.Ladder;
 import gamesrc.util.PresetLoader;
-import gamesrc.game.abstracts.ABoard;
+import gamesrc.abstracts.ABoard;
 import java.util.ArrayList;
 import java.util.List;
 
