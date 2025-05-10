@@ -14,49 +14,47 @@ import java.net.URL;
 import java.util.Objects;
 
 public class GameUI extends JFrame {
-    // Game constants
-    private static final int numRows = 10;
-    private static final int numCols = 10;
-    private static final int boardSize = numRows * numCols;
-
-    // Game variables
     private Board board;
     private Dice dice;
     private Player[] players;
     private int currentPlayerIndex = 0;
 
-    // UI components
     private JPanel boardPanel;
     private JLabel statusLabel;
-    private JButton rollButton;
+    private JButton rollButton; // Sẽ là RoundedButton
+
+    private static final int BOARD_SIZE = 100;
 
     public GameUI() {
         setTitle("Snakes and Ladders - D20 Edition");
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        // setLocationRelativeTo(null); // Sẽ gọi sau pack()
+
         showPlayerSelectionScreen();
     }
 
     private void showPlayerSelectionScreen() {
-        // Content pane
         Container contentPane = getContentPane();
         contentPane.removeAll();
-//        contentPane.setBackground(Color.lightGray);
-        Color bgContentPane = new Color(210, 210, 210);
-        contentPane.setBackground(bgContentPane);
+
+        Color softerBackground = new Color(210, 210, 210);
+        contentPane.setBackground(softerBackground);
 
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-
-        // Padding
         ((JPanel) contentPane).setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
 
-        // Title
         JLabel titleLabel = new JLabel("Snakes & Ladders!");
         titleLabel.setFont(new Font("Arial Black", Font.BOLD, 28));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         contentPane.add(titleLabel);
         contentPane.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        JLabel label = new JLabel("How many players?");
+        label.setFont(new Font("Arial", Font.PLAIN, 18));
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPane.add(label);
+        contentPane.add(Box.createRigidArea(new Dimension(0, 20)));
 
         JButton btn2Players = createPlayerButton("2 Players", 2);
         JButton btn3Players = createPlayerButton("3 Players", 3);
@@ -67,73 +65,67 @@ public class GameUI extends JFrame {
         btn4Players.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         contentPane.add(btn2Players);
-        contentPane.add(Box.createRigidArea(new Dimension(0, 10))); // Space between buttons
+        contentPane.add(Box.createRigidArea(new Dimension(0, 10)));
         contentPane.add(btn3Players);
-        contentPane.add(Box.createRigidArea(new Dimension(0, 10))); // Space between buttons
+        contentPane.add(Box.createRigidArea(new Dimension(0, 10)));
         contentPane.add(btn4Players);
 
-        // Refresh
-        pack(); // Set size itself
-        contentPane.revalidate();
-        contentPane.repaint();
-        setLocationRelativeTo(null); // Recenter after casting pack()
+        pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
-    // Players' choice button
     private JButton createPlayerButton(String text, int playerCount) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 16));
         Dimension buttonSize = new Dimension(150, 50);
-        button.setPreferredSize(buttonSize); // Size
-        button.setMaximumSize(buttonSize); // Locked the size
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.setPreferredSize(buttonSize);
+        button.setMaximumSize(buttonSize);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setFocusPainted(false);
 
-        // Set player count + close dialog
         button.addActionListener(e -> startGame(playerCount));
         return button;
     }
 
     private void startGame(int numberOfPlayers) {
-        // Init game objects
         board = new Board("src/gamesrc/assets/presets/boardPresets.json");
         dice = new Dice();
         players = new Player[numberOfPlayers];
         initPlayers(numberOfPlayers);
 
-        // Setup UI components
+        // boardPanel phải được tạo trước khi nó được dùng làm parent cho dialog (nếu cần)
+        // hoặc trước khi GameUI được dùng làm parent cho dialog (nếu dialog gọi trong context của GameUI)
         boardPanel = new BoardPanel(board, players);
         rollButton = createStyledRollButton(e -> takeTurn());
         statusLabel = new JLabel("Welcome! " + players[0].getName() + "'s turn first.");
         statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
         statusLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        statusLabel.setOpaque(false);
 
         JPanel controlPanel = new JPanel(new BorderLayout(15, 0));
         controlPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        // Color
-        Color bgContentPane = new Color(210, 210, 210);
-        controlPanel.setBackground(bgContentPane);
-        statusLabel.setOpaque(false);
+        Color softerBackground = new Color(210, 210, 210);
+        controlPanel.setBackground(softerBackground);
 
         controlPanel.add(rollButton, BorderLayout.WEST);
         controlPanel.add(statusLabel, BorderLayout.CENTER);
 
-        // Update Content Pane
         Container contentPane = getContentPane();
-        contentPane.removeAll(); // Clear
-        contentPane.setLayout(new BorderLayout()); // Set layout
-        contentPane.setBackground(bgContentPane); // Set background
+        contentPane.removeAll();
+        contentPane.setLayout(new BorderLayout());
+        contentPane.setBackground(softerBackground);
 
         contentPane.add(boardPanel, BorderLayout.CENTER);
         contentPane.add(controlPanel, BorderLayout.SOUTH);
 
-        // Refresh it
-        pack(); // I cast pack() again
+        pack();
+        setLocationRelativeTo(null);
+        // Frame đã hiển thị từ showPlayerSelectionScreen, không cần setVisible(true) ở đây nữa
+        // Nếu bạn muốn đảm bảo, có thể gọi revalidate và repaint
         contentPane.revalidate();
         contentPane.repaint();
-        setLocationRelativeTo(null); // Recenter after casting pack()
     }
 
     private void initPlayers(int numberOfPlayers) {
@@ -160,32 +152,30 @@ public class GameUI extends JFrame {
         button.setFont(new Font("Arial Black", Font.BOLD, 24));
         button.setBackground(new Color(150, 100, 0));
         button.setForeground(new Color(255, 255, 180));
-        button.setFocusPainted(false);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.setRadius(15); // Corner radius
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setRadius(15);
 
-        button.setBorder(BorderFactory.createEmptyBorder(5,15,5,15));
+        button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
 
         button.setPreferredSize(new Dimension(180, 60));
         button.setHorizontalTextPosition(SwingConstants.LEFT);
         button.setIconTextGap(15);
 
-        // Connect your original logic
         button.addActionListener(existingRollListener);
 
-        // Hover effect
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 button.setBackground(new Color(180, 120, 0));
+                button.repaint();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 button.setBackground(new Color(150, 100, 0));
+                button.repaint();
             }
         });
-
         return button;
     }
 
@@ -199,75 +189,57 @@ public class GameUI extends JFrame {
 
         statusLabel.setText(currentPlayer.getName() + " rolled a " + roll);
         int firstPathEnd;
-        int bounceBackTargetSquare = -1; // indicate if we need to go back
+        int bounceBackTargetSquare = -1;
 
-        if (rawTarget > boardSize) {
-            // --- Overshot ---
-            firstPathEnd = boardSize; // Move to 100
-            int excess = rawTarget - boardSize;
-            bounceBackTargetSquare = Math.max(1, boardSize - excess); // Calculate where to bounce back
-
-            // Set movement path ONLY to 100 for the first animation phase
+        if (rawTarget > BOARD_SIZE) {
+            firstPathEnd = BOARD_SIZE;
+            int excess = rawTarget - BOARD_SIZE;
+            bounceBackTargetSquare = Math.max(1, BOARD_SIZE - excess);
             currentPlayer.setMovementPath(from, firstPathEnd);
-            statusLabel.setText(currentPlayer.getName() + " hits 100..."); // Update status
-
+            statusLabel.setText(currentPlayer.getName() + " hits 100...");
         } else {
-            // Did not pass 100
-            firstPathEnd = rawTarget; // Move directly to the target
+            firstPathEnd = rawTarget;
             currentPlayer.setMovementPath(from, firstPathEnd);
         }
 
-        // Start the timer
         Timer timer = getTimer(currentPlayer, bounceBackTargetSquare);
         timer.start();
     }
 
     private Timer getTimer(Player currentPlayer, int bounceBackTargetSquare) {
-        // Use a slightly longer delay maybe? Optional.
         return new Timer(100, new ActionListener() {
-            // State flags
-            boolean isAnimatingMovement = true; // Am I moving?
-            boolean needsToStartBounceBack = (bounceBackTargetSquare != -1); // Do I have to return?
-            boolean teleportCheckPending = true; // Check snakes or ladders
+            boolean isAnimatingMovement = true;
+            boolean needsToStartBounceBack = (bounceBackTargetSquare != -1);
+            boolean teleportCheckPending = true;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 Timer timer = (Timer) e.getSource();
 
-                // Movement (forwards and potentially backwards)
                 if (isAnimatingMovement) {
                     if (currentPlayer.step()) {
-                        // Continue
                         boardPanel.repaint();
                         return;
                     } else {
-                        // Finished the current movement path (either to 100 or to target/bounce-back spot)
-                        isAnimatingMovement = false; // Stop animating for now
+                        isAnimatingMovement = false;
                         boardPanel.repaint();
-
-                        // First IF: Do I have to turn back?
                         if (needsToStartBounceBack) {
                             statusLabel.setText(currentPlayer.getName() + " bounces back from 100!");
-                            // Set the *new* path for the backward movement
-                            currentPlayer.setMovementPath(boardSize, bounceBackTargetSquare);
-                            needsToStartBounceBack = false; // Don't trigger bounce again
-                            isAnimatingMovement = true; // Walk backwards
+                            currentPlayer.setMovementPath(BOARD_SIZE, bounceBackTargetSquare);
+                            needsToStartBounceBack = false;
+                            isAnimatingMovement = true;
                             return;
                         }
                     }
                 }
 
-                // Check Snakes / Ladders
-                // Second last ordered
                 if (teleportCheckPending) {
                     int currentPos = currentPlayer.getPosition();
                     int finalPos = board.checkSnakesAndLadders(currentPos);
-                    teleportCheckPending = false; // Check only once per turn
+                    teleportCheckPending = false;
 
                     if (finalPos != currentPos) {
-                        // Found a snake or ladder.
                         statusLabel.setText(currentPlayer.getName() + (finalPos > currentPos ? " climbed a ladder!" : " slid down a snake!"));
-                        // Animate this? Or snap? Snap.
                         currentPlayer.setPosition(finalPos);
                         boardPanel.repaint();
                     } else {
@@ -275,20 +247,45 @@ public class GameUI extends JFrame {
                     }
                 }
 
-                // End turn
-                // Last order
-                timer.stop(); // Stop the timer
+                timer.stop();
 
-                if (currentPlayer.hasWon(boardSize)) {
-                    statusLabel.setText(currentPlayer.getName() + " wins!!!");
-                    rollButton.setEnabled(false);
+                if (currentPlayer.hasWon(BOARD_SIZE)) {
+                    rollButton.setEnabled(false); // Vô hiệu hóa nút trước
+
+                    WinDialog winDialog = new WinDialog(GameUI.this, currentPlayer.getName());
+                    winDialog.setVisible(true); // Hiển thị dialog và chờ
+
+                    if (winDialog.isPlayAgainSelected()) {
+                        resetGameAndShowPlayerSelection();
+                    } else {
+                        System.exit(0); // Thoát game
+                    }
                 } else {
-                    // Switch to the next player
                     currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
                     statusLabel.setText("Next: " + players[currentPlayerIndex].getName() + "'s turn.");
                     rollButton.setEnabled(true);
                 }
             }
         });
+    }
+
+    // Phương thức để reset game và hiển thị lại màn hình chọn người chơi
+    private void resetGameAndShowPlayerSelection() {
+        // Đặt lại các biến game
+        this.board = null; // Hoặc gọi board.initBoard() nếu có để reset preset
+        this.dice = new Dice(); // Tạo xúc xắc mới
+        this.players = null; // Sẽ được tạo lại
+        this.currentPlayerIndex = 0;
+
+        // Xóa các component UI cũ của game
+        Container contentPane = getContentPane();
+        if (boardPanel != null) {
+            contentPane.remove(boardPanel);
+            boardPanel = null;
+        }
+        // statusLabel và rollButton sẽ được tạo lại trong startGame khi contentPane được thiết lập lại
+
+        // Hiển thị lại màn hình chọn người chơi
+        showPlayerSelectionScreen(); // Phương thức này sẽ removeAll và thiết lập lại contentPane
     }
 }
