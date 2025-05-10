@@ -56,6 +56,10 @@ public class Board {
         return pos;
     }
 
+    public void resetBoard() {
+        initBoard();
+    }
+
     public int getSize() {
         return size;
     }

@@ -17,10 +17,10 @@ public class BoardPanel extends JPanel{
     private static final int numRows = 10;
     private static final int numCols = 10;
 
-    private final Board board;
+    private Board board;
     private Map<String, Image> presetOverlayImages = new HashMap<>();
     private Image currentOverlayImage = null;
-    private final Player[] players;
+    private Player[] players;
     private final int cellSize = 60;
     private final Font boardFont;
     private Image[] playerSprites;
@@ -30,8 +30,14 @@ public class BoardPanel extends JPanel{
     public BoardPanel(Board board, Player[] players) {
         this.board = board;
         this.players = players;
-        this.playerSprites = new Image[players.length]; // Use actual length
-        loadPlayerSprites(); // Load sprites based on players
+
+        if (this.players != null) {
+            this.playerSprites = new Image[this.players.length];
+            loadPlayerSprites(); // Load sprites for initial players
+        } else {
+            this.playerSprites = new Image[0]; // Handle null players case if possible
+        }
+
         loadTiles();
         loadOverlayImage(board.getCurrentActivePresetName());
         setPreferredSize(new Dimension(numRows * cellSize, numCols * cellSize));
@@ -68,6 +74,24 @@ public class BoardPanel extends JPanel{
             this.currentOverlayImage = null;
             e.printStackTrace();
         }
+    }
+
+    public void updateBoard (Board newBoard, Player[] newPlayers) {
+        this.board = newBoard;
+        this.players = newPlayers;
+
+        if (this.players != null) {
+            this.playerSprites = new Image[this.players.length]; // Re-size the sprite array
+            loadPlayerSprites();
+        } else {
+            this.playerSprites = new Image[0];
+        }
+
+        if (this.board != null) {
+            loadOverlayImage(this.board.getCurrentActivePresetName());
+        }
+
+        repaint();
     }
 
     @Override
@@ -182,6 +206,7 @@ public class BoardPanel extends JPanel{
             int finalCell = cell;
 
             Player[] sameCellPlayers = Arrays.stream(players)
+                    .filter(Objects::nonNull)
                     .filter(p -> p.getPosition() == finalCell)
                     .toArray(Player[]::new);
             if (sameCellPlayers.length == 0) continue;
