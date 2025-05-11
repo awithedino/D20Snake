@@ -116,13 +116,10 @@ public class GameUI extends JFrame implements IGameUI {
         return button;
     }
 
-    private void startGame(int numberOfPlayers) {
-        // Initialize game logic objects
-        board = new Board("src/gamesrc/assets/presets/boardPresets.json"); // Path to your presets
     @Override
     public void startGame(int numberOfPlayers) {
-        // Init game objects
-        board = new Board("src/gamesrc/assets/presets/boardPresets.json");
+        // Initialize game logic objects
+        board = new Board("src/gamesrc/assets/presets/boardPresets.json"); // Path to your presets
         dice = new Dice();
         players = new Player[numberOfPlayers];
         initPlayers(numberOfPlayers); // Create player instances
@@ -172,7 +169,8 @@ public class GameUI extends JFrame implements IGameUI {
     }
 
     // Initialize player objects
-    private void initPlayers(int numberOfPlayers) {
+    @Override
+    public void initPlayers(int numberOfPlayers) {
         String[] names = {"Blue", "Green", "Purple", "Orange", "Red", "Yellow"}; // More names if needed
         players = new Player[numberOfPlayers]; // Re-create array to correct size
         for (int i = 0; i < numberOfPlayers; i++) {
