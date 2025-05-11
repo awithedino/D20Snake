@@ -60,6 +60,10 @@ public class Board extends ABoard {
         return pos;
     }
 
+    public void resetBoard() {
+        initBoard();
+    }
+
     public int getSize() {
         return size;
     }
